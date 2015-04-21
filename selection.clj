@@ -1,5 +1,6 @@
 (ns clojure-west.selection
   (:use arcadia.core)
+  (:require [arcadia.introspection :as it])
   (:import [UnityEditor Selection]
            System.Text.RegularExpressions.Regex))
 
@@ -13,9 +14,12 @@
 
 (defn object [x]
   (first (objects x)))
+ 
+;; (defn selected-object []
+;;   (Selection/activeObject))
 
-(defn selected-object []
-  (Selection/activeObject))
+;; (defn selected-objects []
+;;   (Selection/objects))
 
 (defn set-selection!
   ([x]
@@ -23,12 +27,14 @@
   ([x & xs]
      (set! Selection/objects (into-array UnityEngine.Object (cons x xs)))))
 
-(defn selected-objects []
-  (Selection/objects))
-
 (defn sel
-  ([] (selected-object))
-  ([x] (set-selection! x)))
+  ([] (Selection/objects))
+  ([x] (set! Selection/activeObject x))
+  ([x & xs]
+   (set! Selection/objects (into-array UnityEngine.Object (cons x xs)))))
+
+(defn fsel []
+  (Selection/activeObject))
 
 (defn selall [coll]
   (set! Selection/objects
