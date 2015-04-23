@@ -15,12 +15,6 @@
 (defn object [x]
   (first (objects x)))
  
-;; (defn selected-object []
-;;   (Selection/activeObject))
-
-;; (defn selected-objects []
-;;   (Selection/objects))
-
 (defn set-selection!
   ([x]
      (set! Selection/activeObject x))
