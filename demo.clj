@@ -8,7 +8,7 @@
   (:require
    [arcadia.internal.map-utils :as mu]
    [arcadia.introspection :as intro]
-   [clojure-west.updaters :as updaters])
+   [clojure-west.updater :as updater])
   (:import
    [UnityEngine
     Quaternion Vector2 Vector3 Transform GameObject Component
@@ -20,8 +20,6 @@
     Camera]
    [System.Reflection
     PropertyInfo MethodInfo BindingFlags]
-   ;; [UnityEditor
-   ;;  Selection]
    [System.Text.RegularExpressions Regex]))
 
 (defn kill! [x]
@@ -68,6 +66,24 @@
   `(def ~name (selected-object)))
 
 (def-compget transform UnityEngine.Transform)
+
+;; should be inlining, obviously
+(definline ^GameObject game-object [x]
+  `(condcast-> ~x x#
+     UnityEngine.GameObject x#
+     UnityEngine.Component (.gameObject x#)))
+
+;; this should probably be in core, you know?
+(defn objects [x]
+  (condp instance? x
+    String (objects-named x)
+    Regex  (filter
+             (fn [^UnityEngine.GameObject o]
+               (re-find x (.name o)))
+             (objects-typed UnityEngine.GameObject))))
+
+(defn object [x]
+  (first (objects x)))
 
 ;; ============================================================
 ;; raycasting
@@ -118,105 +134,33 @@
 ;; egocam
 ;; ============================================================
 
-(def ^Camera egocam
-  (.GetComponent (object-named "CenterEyeAnchor") Camera))
+(defn ^GameObject egocam []
+  (object-named "CenterEyeAnchor"))
 
 ;; ============================================================
 ;; vr selection
 ;; ============================================================
-
+;; really quick and dirty
 ;; can't use unity editor selection at all
 
-;; (def selection
-;;   (atom []))
-
 (defn egocam-target []
-  (raycast-forward egocam))
+  (raycast-forward (egocam)))
 
 (def selection-key "d")
 
 (defn selection-key-down? []
   (keydown? selection-key))
 
-(defn selection-driver-behavior [this]
+(defn selection-driver []
   (when (keydown? selection-key)
     (sel
       (when-let [^Transform t (:transform (egocam-target))]
-        (.gameObject t))))
-  this)
-
-(def selection-driver
-  {:state nil
-   :behavior #'selection-driver-behavior})
-
-(updaters/put-updater :selection-driver selection-driver)
-
-;; (defn conj-single [coll x]
-;;   (if (if (set? coll)
-;;         (contains? coll x)
-;;         (some #(= x %) coll))
-;;     coll
-;;     (conj coll x)))
-
-;; (defn complete-selection [this]
-;;   (mu/checked-keys [[state] this
-;;                     [building-selection] state]
-;;     (-> this
-;;       (assoc-in [:state :selection] building-selection))))
-
-;; (defscn ^GameObject selection-bobble
-;;   (let [sb (doto (create-primitive :sphere)
-;;              (set-with! [n name]
-;;                "selection bobble"))]
-;;     (deactivate sb)))
+        (.gameObject t)))))
 
 
-;; ;; really show egocam-target
-;; (defn show-selection []
-;;   (when-let [{:keys [point]} (egocam-target)]
-;;     (do (set! (.localPosition (transform selection-bobble))
-;;           point)
-;;         (activate selection-bobble))))
-
-;; (defn selecting [this]
-;;   (if (selection-key-down?)
-;;     (do
-;;       (show-selection)
-;;       this)
-;;     (let [^Transform t (:transform (egocam-target))]
-;;       (-> this
-;;         (update-in [:state :building-selection] conj-single (.gameObject t))
-;;         complete-selection))))
-
-;; ;; need to introduce selecting-group eventually as well
-;; (defn not-selecting [this]
-;;   (if (selection-key-down?)
-;;     (-> this
-;;       (assoc-in [:state :mode] :selecting))
-;;     this))
-
-;; (defn selection-driver-behavior [this]
-;;   (mu/checked-keys [[state] this
-;;                     [mode] state]
-;;     (case mode
-;;       nil (not-selecting this)
-;;       :selecting (selecting this)
-;;       ;:selecting-group (selecting-group this)
-;;       )))
-
-;; (def selection-driver
-;;   {:state {:mode nil
-;;            :selection []
-;;            :building-selection []}
-;;    :behavior #'selection-driver-behavior})
-
-;; (updaters/put-updater :selection-driver selection-driver)
-
-;; ;; this is sort of nasty
-;; (defn selection []
-;;   (get-in @updaters/updaters
-;;     [:updaters :selection-driver :state :selection]))
-
+;; ============================================================
+;; controller, vr camera stuff
+;; ============================================================
 
 (defn controller []
   (.GetComponent (object-named "OVRPlayerController")
@@ -250,7 +194,7 @@
   ([]
    (in-front 1))
   ([dist]
-    (let [t (transform egocam)]
+    (let [t (transform (egocam))]
       (v3+
         (.position t)
         (v3* (.forward t) dist)))))
@@ -262,7 +206,7 @@
   (toggle-active repl))
 
 (defn reposition-repl []
-  (let [^Transform t (transform egocam)]
+  (let [^Transform t (transform (egocam))]
     (populate! repl
       {:transform [{:local-position (in-front)
                     :local-scale (v3 1 1 1)
