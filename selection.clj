@@ -1,9 +1,11 @@
 (ns clojure-west.selection
   (:use arcadia.core)
   (:require [arcadia.introspection :as it])
-  ;; assumes editor
-  ;; (:import [UnityEditor Selection]
-  ;;          System.Text.RegularExpressions.Regex)
+ 
+  (:import
+   ;; assumes editor
+   ;;[UnityEditor Selection]
+   System.Text.RegularExpressions.Regex)
   )
 
 ;; the following assumes editor, exportable version below
