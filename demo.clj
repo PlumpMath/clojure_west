@@ -115,6 +115,13 @@
   obj)
 
 ;; ============================================================
+;; egocam
+;; ============================================================
+
+(def ^Camera egocam
+  (.GetComponent (object-named "CenterEyeAnchor") Camera))
+
+;; ============================================================
 ;; vr selection
 ;; ============================================================
 
@@ -227,21 +234,17 @@
 (defn disable-controller []
   (set! (.enabled (controller)) false))
 
-(def repl (object-named "repl"))
+(def ^GameObject left-eye-anchor
+  (object-named "LeftEyeAnchor"))
 
-(populate! repl
-  {:transform
-   [{:arcadia.hydrate/type UnityEngine.Transform,
-     :local-position #unity/Vector3 [0.0 0.4 1],
-     :local-scale #unity/Vector3 [1 1 1],
-     :local-rotation
-     #unity/Quaternion [0.08167479 0.008283393 -0.0006788307 0.9966244]}]})
+(def ^GameObject center-eye-anchor
+  (object-named "CenterEyeAnchor"))
 
-(defn toggle-repl []
-  (toggle-active repl))
+(def ^GameObject right-eye-anchor
+  (object-named "RightEyeAnchor"))
 
-(def ^GameObject egocam
-  (object-named "OVRCameraRig"))
+;; ============================================================
+;; repl positioning etc
 
 (defn in-front
   ([]
@@ -252,10 +255,15 @@
         (.position t)
         (v3* (.forward t) dist)))))
 
+(def ^GameObject repl
+  (object-named "repl"))
 
-;; ============================================================
-;; egocam
-;; ============================================================
+(defn toggle-repl []
+  (toggle-active repl))
 
-(def ^Camera egocam
-  (.GetComponent (object-named "CenterEyeAnchor") Camera))
+(defn reposition-repl []
+  (let [^Transform t (transform egocam)]
+    (populate! repl
+      {:transform [{:local-position (in-front)
+                    :local-scale (v3 1 1 1)
+                    :local-rotation (v3 0 0 0)}]})))
