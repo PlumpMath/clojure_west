@@ -8,7 +8,7 @@
   (:require
    [arcadia.internal.map-utils :as mu]
    [arcadia.introspection :as intro]
-   ;[clojure-west.updater :as updater]
+   [clojure-west.updater :as updater]
    )
   (:import
    [UnityEngine
