@@ -8,7 +8,8 @@
   (:require
    [arcadia.internal.map-utils :as mu]
    [arcadia.introspection :as intro]
-   [clojure-west.updater :as updater])
+   ;[clojure-west.updater :as updater]
+   )
   (:import
    [UnityEngine
     Quaternion Vector2 Vector3 Transform GameObject Component
@@ -50,23 +51,6 @@
          ~sym (.. obj# ~@props)]
      (set! (.. obj# ~@props) (do ~@body))))
 
-(defn destroy-newbs []
-  (domap destroy (objects "New Game Object")))
-
-;; this could be made into optimized inlining thing when we build out
-;; the type matching machinery a bit more
-(defmacro def-compget [name typesym]
-  (let [objsym (gensym "obj_")]
-    `(defn ~name ~(with-meta [objsym] {:tag typesym}) ;; soon this tag will be important
-       (get-component ~objsym ~typesym))))
-
-;; yeah!
-;; this could even autotag with the actual type !!OMG
-(defmacro def-selected [name]
-  `(def ~name (selected-object)))
-
-(def-compget transform UnityEngine.Transform)
-
 ;; should be inlining, obviously
 (definline ^GameObject game-object [x]
   `(condcast-> ~x x#
@@ -84,6 +68,23 @@
 
 (defn object [x]
   (first (objects x)))
+
+(defn destroy-newbs []
+  (domap destroy (objects "New Game Object")))
+
+;; this could be made into optimized inlining thing when we build out
+;; the type matching machinery a bit more
+(defmacro def-compget [name typesym]
+  (let [objsym (gensym "obj_")]
+    `(defn ~name ~(with-meta [objsym] {:tag typesym}) ;; soon this tag will be important
+       (get-component ~objsym ~typesym))))
+
+;; yeah!
+;; this could even autotag with the actual type !!OMG
+(defmacro def-selected [name]
+  `(def ~name (selected-object)))
+
+(def-compget transform UnityEngine.Transform)
 
 ;; ============================================================
 ;; raycasting
