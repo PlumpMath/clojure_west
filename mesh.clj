@@ -1,5 +1,5 @@
 (ns clojure-west.mesh
-  (:use [arcadia.core arcadia.linear])
+  (:use arcadia.core arcadia.linear)
   (:import [UnityEngine Mesh Vector3]
            [LibTessDotNet Tess ContourVertex]
            [UnityEngine MeshFilter MeshRenderer
@@ -133,22 +133,22 @@
 ;; LibTess interop
 ;; ============================================================
 
-(defn- tessv-to-unityv ^UnityEngine.Vector3 [^LibTessDotNet.Vec3 v]
+(defn tessv-to-unityv ^UnityEngine.Vector3 [^LibTessDotNet.Vec3 v]
   (v3 (.X v) (.Y v) (.Z v)))
 
-(defn- unityv-to-tessv ^LibTessDotNet.Vec3 [^UnityEngine.Vector3 v]
+(defn unityv-to-tessv ^LibTessDotNet.Vec3 [^UnityEngine.Vector3 v]
   (LibTessDotNet.Vec3/qwikVec3 (.x v) (.y v) (.z v)))
 
-(defn- unityv-to-contourv ^ContourVertex [^Vector3 v]
+(defn unityv-to-contourv ^ContourVertex [^Vector3 v]
   (let [^ContourVertex cv (ContourVertex.)]
     (set! (.Position cv) (unityv-to-tessv v))
     cv))
 
-(defn- triangulate-tess ^Tess [v3s] 
+(defn triangulate-tess ^Tess [v3s] 
   (let [^|LibTessDotNet.ContourVertex[]| contour (->> v3s
                                                    (map unityv-to-contourv)
                                                    (into-array LibTessDotNet.ContourVertex))]
-   
+    
     (let [^Tess tess (Tess.)]
       (.AddContour tess contour) ;; can add some winding specification thing as extra arg here
       (.Tessellate tess
