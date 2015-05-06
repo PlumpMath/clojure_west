@@ -1,7 +1,6 @@
 (ns clojure-west.updater
   (:use arcadia.core)
-  (:require [arcadia.internal.map-utils :as mu]
-            arcadia.inspectors))
+  (:require [arcadia.internal.map-utils :as mu]))
 
 (def disabled
   (atom #{}))
@@ -19,9 +18,9 @@
   (swap! disabled disj k))
 
 (defn toggle [k]
-  (swap! disabled #(if (# k) (disj # k) (conj # k))))
+  (swap! disabled #(if (% k) (disj % k) (conj % k))))
 
-(defn run-updaters [updater]
+(defn run-updaters []
   (let [ds @disabled]
    (doseq [[k f] @updater-fns
            :when (not (ds k))]
@@ -29,4 +28,4 @@
 
 (defcomponent Updater []
   (Update [this]
-    (run-updaters @updaters)))
+    (run-updaters)))
