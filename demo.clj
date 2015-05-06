@@ -18,7 +18,8 @@
     Gizmos Texture2D Resources Mathf
     Physics Ray RaycastHit
     Input
-    Camera]
+    Camera
+    Application]
    [System.Reflection
     PropertyInfo MethodInfo BindingFlags]
    [System.Text.RegularExpressions Regex]))
@@ -212,3 +213,35 @@
       {:transform [{:local-position (in-front)
                     :local-scale (v3 1 1 1)
                     :local-rotation (v3 0 0 0)}]})))
+
+;; ============================================================
+;; test some shit
+;; ============================================================
+
+(def screenshot-counter
+  (atom 0))
+
+(defn screen-nabber
+  ([]
+   (screen-nabber
+     (str "screenshot_" (swap! screenshot-counter inc))))
+  ([filename]
+   (Application/CaptureScreenshot filename)))
+
+(declare oculus-opening-grabber-update)
+
+(defcomponent OculusOpeningGrabber [^Int32 i]
+  (Start [this]
+    (oculus-opening-grabber-update this))
+  (Awake [this]
+    (oculus-opening-grabber-update this))
+  (Update [this]
+    (oculus-opening-grabber-update this)))
+
+(defn oculus-opening-grabber-update [^OculusOpeningGrabber this]
+  (let [i (.i this)]
+    (when (< i 40)
+      (screen-nabber)
+      (set! (.i this) (inc i)))
+    this))
+
