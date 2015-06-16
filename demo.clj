@@ -201,11 +201,11 @@
         (.position t)
         (v3* (.forward t) dist)))))
 
-(def ^GameObject repl
+(defn ^GameObject repl []
   (object-named "repl"))
 
-(defn toggle-repl []
-  (toggle-active repl))
+(defn reptog []
+  (toggle-active (repl)))
 
 (defn reposition-repl []
   (let [^Transform t (transform (egocam))]
@@ -215,7 +215,31 @@
                     :local-rotation (v3 0 0 0)}]})))
 
 ;; ============================================================
-;; test some shit
+;; pivot
+
+;; (defn point-pivot ^Vector3 [^Vector3 target, ^Vector3 piv, ^Quaternion rot]
+;;   (v3+ (qv* rot (v3- target piv)) piv))
+
+(defn pivot-local-transform! ^Transform [^Transform trns, piv, rot]
+  (doto trns
+    (set-with! [lr localRotation]
+      (qq* rot lr))
+    (set-with! [lp localPosition]
+      (point-pivot lp piv rot))))
+
+(defn pivot-transform! ^Transform [^Transform trns, piv, rot]
+  (doto trns
+    (set-with! [r rotation]
+      (qq* rot r))
+    (set-with! [p Position]
+      (point-pivot p piv rot))))
+
+(defn pivot! [target piv rot]
+  (pivot-transform! (transform target) piv rot)
+  target)
+
+;; ============================================================
+;; test some
 ;; ============================================================
 
 (def screenshot-counter
