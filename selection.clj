@@ -1,6 +1,6 @@
 (ns clojure-west.selection
   (:use arcadia.core)
-  ;(:require [clojure-west.raycast :as ry])
+  ;;(:require [clojure-west.raycast :as ry])
   )
 
 ;; Intended mostly for live use, so emphasizing expressivity over
@@ -16,7 +16,7 @@
 
 (def ^:dynamic *selection*
   "Current meaning of selection state for selection functions, by
-  default global-selection. Contents must be an atom."
+  default global-selection. Must be an atom."
   global-selection)
 
 (defn sel
