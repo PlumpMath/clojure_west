@@ -56,20 +56,12 @@
   []
   (first @*selection*))
 
-(defn selc
+(defn sel-all
   "Sets contents of *selection* atom to (empty *selection*) with
   contents of coll conj'ed on."
   [coll]
   (swap! *selection*
     #(into (empty %) coll)))
-
-(defn sel-all
-  "Resets value of *selection* to coll if (set? coll), otherwise (set coll)."
-  [coll]
-  (reset! *selection*
-    (if (set? coll)
-      coll
-      (set coll))))
 
 (defn sel-none
   "Sets value of *selection* to (empty *selection*)"
