@@ -49,7 +49,7 @@
   ([x] (swap! *selection* disj x))
   ([x & xs]
    (swap! *selection*
-     #(reduce disj % (cons x xs)))))
+     #(reduce disj (disj % x) xs))))
 
 (defn fsel
   "Returns first item in *selection*."
