@@ -7,9 +7,9 @@
         clojure.repl)
   (:require
    [arcadia.internal.map-utils :as mu]
-   [arcadia.introspection :as intro]
-   [clojure-west.updater :as updater]
-   )
+   ;;[arcadia.introspection :as intro]
+   ;;[clojure-west.updater :as updater]
+   [arcadia.updater :as updater])
   (:import
    [UnityEngine
     Quaternion Vector2 Vector3 Transform GameObject Component
@@ -201,11 +201,11 @@
         (.position t)
         (v3* (.forward t) dist)))))
 
-(defn ^GameObject repl []
+(def ^GameObject repl
   (object-named "repl"))
 
 (defn reptog []
-  (toggle-active (repl)))
+  (toggle-active repl))
 
 (defn reposition-repl []
   (let [^Transform t (transform (egocam))]
