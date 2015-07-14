@@ -1,6 +1,7 @@
 (ns clojure-west.selection
   (:use arcadia.core)
-  (:require [clojure-west.raycast :as ry]))
+  ;(:require [clojure-west.raycast :as ry])
+  )
 
 ;; Intended mostly for live use, so emphasizing expressivity over
 ;; performance.
@@ -76,15 +77,15 @@
   []
   (swap! *selection* empty))
 
-;; ============================================================
-;; finesse
-;; ============================================================
+;; ;; ============================================================
+;; ;; finesse
+;; ;; ============================================================
 
-(defn forward [x]
-  (sel (ry/raycast-forward x)))
+;; (defn forward [x]
+;;   (sel (ry/raycast-forward x)))
 
-(defn forward+ [x]
-  (sel+ (ry/raycast-forward x)))
+;; (defn forward+ [x]
+;;   (sel+ (ry/raycast-forward x)))
 
-(defn forward- [x]
-  (sel- (ry/raycast-forward x)))
+;; (defn forward- [x]
+;;   (sel- (ry/raycast-forward x)))
